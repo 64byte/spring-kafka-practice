@@ -23,7 +23,10 @@ public class DemoApplication implements CommandLineRunner {
     @Autowired
     private KafkaTemplate<String, String> template;
 
-    private final CountDownLatch latch = new CountDownLatch(3);
+    @Autowired
+    private KafkaTemplateSender kafkaTemplateSender;
+
+    private final CountDownLatch latch = new CountDownLatch(2);
 
     public static void main(String[] args) {
         SpringApplication.run(DemoApplication.class, args);
@@ -33,12 +36,19 @@ public class DemoApplication implements CommandLineRunner {
     @Override
     public void run(String... args) throws Exception {
         this.template.send("myTopic", "foo1");
+        kafkaTemplateSender.sendTemplate("some message");
         latch.await(60, TimeUnit.SECONDS);
         logger.info("All received");
     }
 
     @KafkaListener(topics = "myTopic", groupId = "foo")
     public void listen(ConsumerRecord<?, ?> cr) throws Exception {
+        logger.info(cr.toString());
+        latch.countDown();
+    }
+
+    @KafkaListener(topics = "to-topic", groupId = "foo")
+    public void listen2(ConsumerRecord<?, ?> cr) throws Exception {
         logger.info(cr.toString());
         latch.countDown();
     }
