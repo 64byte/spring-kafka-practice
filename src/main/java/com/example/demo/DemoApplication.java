@@ -26,7 +26,7 @@ public class DemoApplication implements CommandLineRunner {
     @Autowired
     private KafkaTemplateSender kafkaTemplateSender;
 
-    private final CountDownLatch latch = new CountDownLatch(2);
+    private final CountDownLatch latch = new CountDownLatch(1);
 
     public static void main(String[] args) {
         SpringApplication.run(DemoApplication.class, args);
@@ -35,12 +35,12 @@ public class DemoApplication implements CommandLineRunner {
 
     @Override
     public void run(String... args) throws Exception {
-        this.template.send("myTopic", "foo1");
-        this.template.send("topic2", "dfasfjklesjklsaf");
-
-        for (int i=0; i<100; ++i) {
-            this.template.send("topic1", "test " + i);
-        }
+//        this.template.send("myTopic", "foo1");
+//        this.template.send("topic2", "dfasfjklesjklsaf");
+//
+//        for (int i=0; i<100; ++i) {
+//            this.template.send("topic1", "test " + i);
+//        }
 
         kafkaTemplateSender.sendTemplate("some message");
         latch.await(60, TimeUnit.SECONDS);
